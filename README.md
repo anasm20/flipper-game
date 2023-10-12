@@ -19,3 +19,11 @@
 8. GUI mit tkinter: Die grafische Benutzeroberfläche kann mithilfe des tkinter-Frameworks erstellt werden. In Ihrer GUI können Sie Statusanzeigen, Tasten und Anzeigen für Kredit, Bälle usw. erstellen.
 
 
+Der Spiel:
+<img width="1704" alt="Screenshot 2023-10-12 at 14 23 33" src="https://github.com/anasm20/flipper-game/assets/112882511/08bc295c-1eda-4f17-9428-0be9021a0cb7">
+
+GUI:
+<img width="210" alt="Screenshot 2023-10-12 at 14 24 06" src="https://github.com/anasm20/flipper-game/assets/112882511/e42b84d0-844e-4716-9bab-774b500ac361">
+
+
+
