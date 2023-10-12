@@ -1,9 +1,6 @@
 import random
 import tkinter as tk
 
-
-#### To use flipperGUI please use the Terminal (python3 flipperGUI.py) ####
-
 class Zustand:
     NoCredit = 0
     Ready = 1
@@ -31,6 +28,9 @@ class FlipperGUI:
         self.play_button = tk.Button(root, text="Play", command=self.play)
         self.play_button.pack()
 
+        self.status_button = tk.Button(root, text="Check Status", command=self.check_status)
+        self.status_button.pack()
+
         self.quit_button = tk.Button(root, text="Quit", command=root.quit)
         self.quit_button.pack()
 
@@ -55,17 +55,20 @@ class FlipperGUI:
 
     def play(self):
         if self.state == Zustand.Playing:
-            self.balls -= 1
-            if self.balls == 0:
-                self.label.config(text="Game over.")
-                self.state = Zustand.NoCredit
+            if self.balls > 0:
+                self.balls -= 1
+                if self.balls == 0:
+                    self.label.config(text="Game over.")
+                    self.state = Zustand.NoCredit
+                else:
+                    score = random.randint(1, 100)
+                    self.credit += score
+                    self.label.config(text=f"You scored {score} points. Credit: {self.credit}")
+                    if self.credit >= 1000:
+                        self.label.config(text="You win a free game!")
+                        self.credit -= 1000
             else:
-                score = random.randint(1, 100)
-                self.credit += score
-                self.label.config(text=f"You scored {score} points. Credit: {self.credit}")
-                if self.credit >= 1000:
-                    self.label.config(text="You win a free game!")
-                    self.credit -= 1000
+                self.label.config(text="No balls left. Game over.")
         elif self.state == Zustand.NoCredit:
             self.label.config(text="No credit. Insert coin first.")
         else:
@@ -73,7 +76,7 @@ class FlipperGUI:
 
         self.update_label()
 
-    def update_label(self):
+    def check_status(self):
         state_names = {
             Zustand.NoCredit: "NoCredit",
             Zustand.Ready: "Ready",
@@ -81,7 +84,14 @@ class FlipperGUI:
             Zustand.EndState: "EndState"
         }
         state_name = state_names[self.state]
+
+        if self.balls < 0:
+            self.balls = 0
+
         self.label.config(text=f"State: {state_name}\nBalls left: {self.balls}\nCredit: {self.credit}")
+
+    def update_label(self):
+        self.check_status()
 
 if __name__ == "__main__":
     root = tk.Tk()

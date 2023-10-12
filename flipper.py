@@ -33,17 +33,20 @@ class FlipperAutomat:
     # Spielen eines Balls
     def play(self):
         if self.state == Zustand.Playing:
-            self.balls -= 1
-            if self.balls == 0:
-                print("Game over.")
-                self.state = Zustand.NoCredit
+            if self.balls > 0:
+                self.balls -= 1
+                if self.balls == 0:
+                    print("Game over.")
+                    self.state = Zustand.NoCredit
+                else:
+                    score = random.randint(1, 100)
+                    self.credit += score
+                    print(f"You scored {score} points. Credit: {self.credit}")
+                    if self.credit >= 1000:
+                        print("You win a free game!")
+                        self.credit -= 1000
             else:
-                score = random.randint(1, 100)
-                self.credit += score
-                print(f"You scored {score} points. Credit: {self.credit}")
-                if self.credit >= 1000:
-                    print("You win a free game!")
-                    self.credit -= 1000
+                print("No balls left. Game over.")
         elif self.state == Zustand.NoCredit:
             print("No credit. Insert coin first.")
         else:
@@ -51,6 +54,8 @@ class FlipperAutomat:
 
     # Überprüfen des aktuellen Status
     def check_status(self):
+        if self.balls < 0:
+            self.balls = 0
         print(f"State: {self.state}, Balls left: {self.balls}, Credit: {self.credit}")
 
 if __name__ == "__main__":
