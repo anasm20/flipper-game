@@ -1,14 +1,12 @@
 import random
 from termcolor import colored
 
-# Zustände des Flipperautomaten
 class Zustand:
     NoCredit = 0
     Ready = 1
     Playing = 2
     EndState = 3
 
-# Befehlsklasse für die Punktevergabe
 class PunkteVerleihen:
     def __init__(self, punkte):
         self.punkte = punkte
@@ -16,15 +14,13 @@ class PunkteVerleihen:
     def execute(self, flipper):
         flipper.credit += self.punkte
 
-# Befehlsklasse für die Auswahl des Spielers
 class SpielerAuswahl:
-    def __init(self, spieler):
+    def __init__(self, spieler):
         self.spieler = spieler
 
     def execute(self, flipper):
         flipper.selected_player = self.spieler
 
-# Elemente des Flipper-Spiels
 class FlipperElement:
     def __init__(self, name):
         self.name = name
@@ -32,14 +28,21 @@ class FlipperElement:
     def hit(self):
         pass
 
-# Ein einfaches Hole-Element, das Punkte vergibt und Spieler auswählt
 class Hole(FlipperElement):
     def hit(self):
         punkte_verleihen = PunkteVerleihen(random.randint(10, 50))
         spieler_auswahl = SpielerAuswahl(random.choice([1, 2, 3]))
         return [punkte_verleihen, spieler_auswahl]
 
-# Flipperautomat mit Text in weißer Farbe
+class RampenElement(FlipperElement):
+    def hit(self, current_player):
+        if current_player == 1:
+            print("The ramp was hit. Custom actions for Player 1.")
+            # Add your custom actions for Player 1 here
+        else:
+            print("The ramp was hit. Custom actions for Player 2.")
+            # Add your custom actions for Player 2 here
+
 class FlipperAutomat:
     def __init__(self):
         self.credit = 0
@@ -47,6 +50,9 @@ class FlipperAutomat:
         self.state = Zustand.NoCredit
         self.selected_player = 1
         self.first_time = True
+
+        self.mediator = FlipperMediator()
+        self.visitor = PunkteVisitor()  # Visitor for scoring
 
     def insert_coin(self):
         if self.state == Zustand.NoCredit:
@@ -74,7 +80,7 @@ class FlipperAutomat:
 
     def show_playing_text(self):
         if self.state == Zustand.Playing:
-            ball_type = random.choice(["# Ball-Type", " "])  # Beispielhaft: Zufällig ein Balltyp
+            ball_type = random.choice(["# Ball", " "])
             white_text = colored(ball_type, "white")
             print(white_text)
 
@@ -92,8 +98,22 @@ class FlipperAutomat:
                     if self.credit >= 1000:
                         print("You win a free game!")
                         self.credit -= 1000
-                hit_hole = random.choice(["Hole hit", "Hole not hit"])  # Zufällig wählen, ob das Loch getroffen wurde
+                hit_hole = random.choice(["Hole hit", "Hole not hit"])
                 print(hit_hole)
+
+                hole = Hole("Hole")
+                actions = hole.hit()
+                for action in actions:
+                    action.execute(self)
+
+                # Here the mediator can be used to coordinate actions for the ramp
+                rampen_element = RampenElement("Ramp")
+                rampen_element.hit(self.selected_player)
+                self.mediator.trigger_ramp_action(rampen_element)
+
+                # Here the points visitor is called
+                self.visitor.visit(self)
+
             else:
                 print("No balls left. Game over :( .")
         elif self.state == Zustand.NoCredit:
@@ -105,6 +125,26 @@ class FlipperAutomat:
         if self.balls <= 0:
             self.balls = 0
         print(f"State: {self.state}, Balls left: {self.balls}, Credit: {self.credit}, Selected Player: {self.selected_player}")
+
+    def switch_gamer(self):
+        new_player = self.selected_player % 2 + 1
+        print(f"Switching to Player {new_player}")
+        self.selected_player = new_player
+
+class FlipperMediator:
+    def trigger_ramp_action(self, element):
+        if isinstance(element, RampenElement):
+            # Here, actions for hitting the ramp can be added if necessary
+            pass
+
+class Visitor:
+    def visit(self, flipper):
+        pass
+
+class PunkteVisitor(Visitor):
+    def visit(self, flipper):
+        # Points calculations can be performed here
+        pass
 
 if __name__ == "__main__":
     flipper = FlipperAutomat()
@@ -118,7 +158,8 @@ if __name__ == "__main__":
         print("2 - Press start")
         print("3 - Play")
         print("4 - Check status")
-        print("5 - Quit")
+        print("5 - Switch Gamer")
+        print("6 - Quit")
 
         choice = input("Enter your choice: ")
 
@@ -131,6 +172,8 @@ if __name__ == "__main__":
         elif choice == "4":
             flipper.check_status()
         elif choice == "5":
+            flipper.switch_gamer()
+        elif choice == "6":
             break
         else:
             print("Invalid choice. Please try again.")

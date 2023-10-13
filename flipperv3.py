@@ -74,7 +74,7 @@ class FlipperAutomat:
 
     def show_playing_text(self):
         if self.state == Zustand.Playing:
-            ball_type = random.choice(["# Ball-Type", " "])  # Beispielhaft: Zufällig ein Balltyp
+            ball_type = random.choice(["# Ball", " "])  # Beispielhaft: Zufällig ein Balltyp
             white_text = colored(ball_type, "white")
             print(white_text)
 
